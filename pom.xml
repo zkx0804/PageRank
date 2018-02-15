@@ -29,7 +29,7 @@
 						<configuration>
 							<mainClass>edu.unh.cs980.PageRankMain</mainClass>
 							<arguments>
-								<argument>run</argument>
+								<argument>false</argument>
 							</arguments>
 						</configuration>
 					</execution>

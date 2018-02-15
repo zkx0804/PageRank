@@ -19,24 +19,43 @@ public class PageRankMain {
 	static int number_of_nodes = 0;
 	static int steps = 30;
 	static int tops = 10;
+	static boolean personlizedPageRank = false;
 	static HashMap<Integer, PageNode> init_matrix;
 	static HashMap<Integer, Float> score_map;
 
-	static HashMap<Integer, Float> vector;
+	static HashMap<Integer, PageNode> seed_matrix;
 
 	public static void main(String[] args) {
 		System.out.println("Start...");
 		init_matrix = new HashMap<Integer, PageNode>();
+		seed_matrix = new HashMap<Integer, PageNode>();
 
 		// String filePath = args[0];
+
+		if (args.length != 0) {
+			personlizedPageRank = Boolean.valueOf(args[0].toLowerCase());
+		}
 		try {
 			init_matrix = CreateNodesMap("input/graph.txt");
+			if (personlizedPageRank) {
+				seed_matrix = CreateNodesMap("input/seeds.txt");
+			}
+
 			System.out.println("Number of components: 1");
 			for (int i = 0; i < steps; i++) {
 				for (Map.Entry<Integer, PageNode> entry : init_matrix.entrySet()) {
 					PageNode node = entry.getValue();
 					if (i == 0) {
-						node.setNodeScore((float) 1 / number_of_nodes);
+						if (personlizedPageRank) {
+							if (seed_matrix.containsKey(node.getNodeId())) {
+								node.setNodeScore((float) 1 / number_of_nodes);
+							} else {
+								node.setNodeScore(0);
+							}
+						} else {
+
+							node.setNodeScore((float) 1 / number_of_nodes);
+						}
 						// node.setNodeScore((float) 1.0);
 					} else {
 						float prev_score = node.getNodeScore();
@@ -82,6 +101,12 @@ public class PageRankMain {
 				}
 				System.out.println("Rank: " + count + "        " + entry.getKey() + "  =====> " + entry.getValue());
 				count += 1;
+			}
+			if (personlizedPageRank) {
+				System.out.println("PageRank score for seeds set: ");
+				for (Map.Entry<Integer, PageNode> entry : seed_matrix.entrySet()) {
+					System.out.println(entry.getKey() + "   =====> " + score_map.get(entry.getKey()));
+				}
 			}
 
 		} catch (Exception e) {
